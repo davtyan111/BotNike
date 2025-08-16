@@ -1,0 +1,20 @@
+<h2>📦 Управление тарифами</h2>
+
+<form method="post">
+  <input type="text" name="tariff_name" placeholder="Новый тариф" required>
+  <button name="add" type="submit">Добавить</button>
+</form>
+
+<ul>
+  {% for t in tariffs %}
+    <li>
+      {{ t.name }}
+      <form method="post" style="display:inline;">
+        <input type="hidden" name="delete" value="{{ t.id }}">
+        <button type="submit">Удалить</button>
+      </form>
+    </li>
+  {% endfor %}
+</ul>
+
+<a href="/">⬅ Назад</a>

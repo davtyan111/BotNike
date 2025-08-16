@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>📍 Управление локациями</title>
+</head>
+<body>
+  <h2>📍 Управление локациями</h2>
+
+  <form method="POST">
+    <input type="text" name="name" placeholder="Новая локация" required>
+    <button type="submit">Добавить</button>
+  </form>
+
+  <ul>
+    {% for location in locations %}
+      <li>
+        {{ location.name }}
+        <a href="{{ url_for('delete_location_route', id=location.id) }}">❌ Удалить</a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <br>
+  <a href="{{ url_for('index') }}">← Назад</a>
+</body>
+</html>

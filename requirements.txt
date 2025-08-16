@@ -1,0 +1,9 @@
+flask-wtf
+wtforms
+google-api-python-client
+requests
+mysql-connector-python
+google-api-python-client
+google-auth
+google-auth-oauthlib
+google-auth-httplib2

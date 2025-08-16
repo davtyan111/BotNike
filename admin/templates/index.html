@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Загрузка фото</title>
+</head>
+<body>
+  <h1>Загрузить фото в Google Drive</h1>
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <label>Выбери файл:</label>
+    <input type="file" name="file" required><br><br>
+
+    <label>Тариф:</label>
+    <select name="tariff" required>
+      <option value="">-- Выбери тариф --</option>
+      {% for t in tariffs %}
+        <option value="{{ t.name }}">{{ t.name }}</option>
+      {% endfor %}
+    </select><br><br>
+
+    <label>Локация:</label>
+    <select name="location" required>
+      <option value="">-- Выбери локацию --</option>
+      {% for loc in locations %}
+        <option value="{{ loc.name }}">{{ loc.name }}</option>
+      {% endfor %}
+    </select><br><br>
+
+    <label>Тип:</label>
+    <select name="subcode" required>
+      <option value="">-- Выбери тип --</option>
+      {% for s in subcodes %}
+        <option value="{{ s.name }}">{{ s.name }}</option>
+      {% endfor %}
+    </select><br><br>
+
+    <button type="submit">Загрузить</button>
+  </form>
+
+  <script>
+    document.querySelector('form').addEventListener('submit', function (e) {
+      const file = document.querySelector('input[name="file"]').files[0];
+      const tariff = document.querySelector('select[name="tariff"]').value;
+      const location = document.querySelector('select[name="location"]').value;
+      const subcode = document.querySelector('select[name="subcode"]').value;
+
+      if (!file || !tariff || !location || !subcode) {
+        alert("❗ Заполните все поля и выберите файл.");
+        e.preventDefault();
+      }
+    });
+  </script>
+
+  <hr>
+  <a href="/tariffs">📦 Управление тарифами</a> |
+  <a href="/locations">📍 Управление локациями</a> |
+  <a href="/subcodes">🔢 Управление типами</a>
+</body>
+</html>

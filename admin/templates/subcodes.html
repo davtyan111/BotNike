@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>📊 Управление типами</title>
+</head>
+<body>
+  <h2>📊 Управление типами</h2>
+
+  <form method="post">
+    <input type="text" name="name" placeholder="Новый тип" required>
+    <button type="submit" name="add">➕ Добавить</button>
+  </form>
+
+  <ul>
+    {% for subcode in subcodes %}
+      <li>
+        {{ subcode.name }}
+        <a href="{{ url_for('delete_subcode_route', id=subcode.id) }}">❌ Удалить</a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <br>
+  <a href="{{ url_for('index') }}">← Назад</a>
+</body>
+</html>
