@@ -1,58 +1,140 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <title>Загрузка фото</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ Панель - Загрузка фото</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  <h1>Загрузить фото в Google Drive</h1>
-  <form action="/upload" method="post" enctype="multipart/form-data">
-    <label>Выбери файл:</label>
-    <input type="file" name="file" required><br><br>
+    <!-- Header -->
+    <header class="admin-header">
+        <h1><i class="fas fa-cog"></i> Админ Панель</h1>
+        <div class="user-info">
+            <span>Добро пожаловать, Администратор</span>
+            <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+        </div>
+    </header>
 
-    <label>Тариф:</label>
-    <select name="tariff" required>
-      <option value="">-- Выбери тариф --</option>
-      {% for t in tariffs %}
-        <option value="{{ t.name }}">{{ t.name }}</option>
-      {% endfor %}
-    </select><br><br>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <ul class="sidebar-nav">
+            <li><a href="/" class="active"><i class="fas fa-home"></i> Главная</a></li>
+            <li><a href="/tariffs"><i class="fas fa-tags"></i> Тарифы</a></li>
+            <li><a href="/locations"><i class="fas fa-map-marker-alt"></i> Локации</a></li>
+            <li><a href="/subcodes"><i class="fas fa-list"></i> Типы</a></li>
+            <li><a href="/dashboard"><i class="fas fa-chart-bar"></i> Статистика</a></li>
+            <li><a href="/settings"><i class="fas fa-cog"></i> Настройки</a></li>
+        </ul>
+    </nav>
 
-    <label>Локация:</label>
-    <select name="location" required>
-      <option value="">-- Выбери локацию --</option>
-      {% for loc in locations %}
-        <option value="{{ loc.name }}">{{ loc.name }}</option>
-      {% endfor %}
-    </select><br><br>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" data-value="1250">0</div>
+                <div class="stat-label">Всего фото</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-value="45">0</div>
+                <div class="stat-label">Локаций</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-value="12">0</div>
+                <div class="stat-label">Тарифов</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-value="8">0</div>
+                <div class="stat-label">Типов</div>
+            </div>
+        </div>
 
-    <label>Тип:</label>
-    <select name="subcode" required>
-      <option value="">-- Выбери тип --</option>
-      {% for s in subcodes %}
-        <option value="{{ s.name }}">{{ s.name }}</option>
-      {% endfor %}
-    </select><br><br>
+        <!-- Upload Section -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-cloud-upload-alt"></i> Загрузка фото в Google Drive</h3>
+            </div>
+            <form action="/upload" method="post" enctype="multipart/form-data" class="upload-form">
+                <div class="form-group">
+                    <label class="form-label">Выберите файл:</label>
+                    <input type="file" name="file" class="form-control" required accept="image/*">
+                </div>
 
-    <button type="submit">Загрузить</button>
-  </form>
+                <div class="form-group">
+                    <label class="form-label">Тариф:</label>
+                    <select name="tariff" class="form-control" required>
+                        <option value="">-- Выберите тариф --</option>
+                        {% for t in tariffs %}
+                            <option value="{{ t.name }}">{{ t.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-  <script>
-    document.querySelector('form').addEventListener('submit', function (e) {
-      const file = document.querySelector('input[name="file"]').files[0];
-      const tariff = document.querySelector('select[name="tariff"]').value;
-      const location = document.querySelector('select[name="location"]').value;
-      const subcode = document.querySelector('select[name="subcode"]').value;
+                <div class="form-group">
+                    <label class="form-label">Локация:</label>
+                    <select name="location" class="form-control" required>
+                        <option value="">-- Выберите локацию --</option>
+                        {% for loc in locations %}
+                            <option value="{{ loc.name }}">{{ loc.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-      if (!file || !tariff || !location || !subcode) {
-        alert("❗ Заполните все поля и выберите файл.");
-        e.preventDefault();
-      }
-    });
-  </script>
+                <div class="form-group">
+                    <label class="form-label">Тип:</label>
+                    <select name="subcode" class="form-control" required>
+                        <option value="">-- Выберите тип --</option>
+                        {% for s in subcodes %}
+                            <option value="{{ s.name }}">{{ s.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-  <hr>
-  <a href="/tariffs">📦 Управление тарифами</a> |
-  <a href="/locations">📍 Управление локациями</a> |
-  <a href="/subcodes">🔢 Управление типами</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> Загрузить
+                </button>
+            </form>
+        </div>
+
+        <!-- Recent Uploads -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-history"></i> Последние загрузки</h3>
+            </div>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Файл</th>
+                            <th>Тариф</th>
+                            <th>Локация</th>
+                            <th>Тип</th>
+                            <th>Дата</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>photo_001.jpg</td>
+                            <td>Стандарт</td>
+                            <td>Центральный офис</td>
+                            <td>Портрет</td>
+                            <td>2 минуты назад</td>
+                        </tr>
+                        <tr>
+                            <td>photo_002.jpg</td>
+                            <td>Премиум</td>
+                            <td>Филиал №1</td>
+                            <td>Групповое</td>
+                            <td>5 минут назад</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 </body>
 </html>

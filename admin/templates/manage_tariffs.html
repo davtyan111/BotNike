@@ -1,20 +1,115 @@
-<h2>📦 Управление тарифами</h2>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление тарифами</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="admin-header">
+        <h1><i class="fas fa-cog"></i> Админ Панель</h1>
+        <div class="user-info">
+            <span>Добро пожаловать, Администратор</span>
+            <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+        </div>
+    </header>
 
-<form method="post">
-  <input type="text" name="tariff_name" placeholder="Новый тариф" required>
-  <button name="add" type="submit">Добавить</button>
-</form>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <ul class="sidebar-nav">
+            <li><a href="/"><i class="fas fa-home"></i> Главная</a></li>
+            <li><a href="/tariffs" class="active"><i class="fas fa-tags"></i> Тарифы</a></li>
+            <li><a href="/locations"><i class="fas fa-map-marker-alt"></i> Локации</a></li>
+            <li><a href="/subcodes"><i class="fas fa-list"></i> Типы</a></li>
+            <li><a href="/dashboard"><i class="fas fa-chart-bar"></i> Статистика</a></li>
+            <li><a href="/settings"><i class="fas fa-cog"></i> Настройки</a></li>
+        </ul>
+    </nav>
 
-<ul>
-  {% for t in tariffs %}
-    <li>
-      {{ t.name }}
-      <form method="post" style="display:inline;">
-        <input type="hidden" name="delete" value="{{ t.id }}">
-        <button type="submit">Удалить</button>
-      </form>
-    </li>
-  {% endfor %}
-</ul>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h2><i class="fas fa-tags"></i> Управление тарифами</h2>
+            <p>Добавляйте и управляйте тарифами для фотосессий</p>
+        </div>
 
-<a href="/">⬅ Назад</a>
+        <!-- Add Tariff Form -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-plus"></i> Добавить новый тариф</h3>
+            </div>
+            <form method="POST" class="tariff-form">
+                <div class="form-group">
+                    <label class="form-label">Название тарифа:</label>
+                    <input type="text" name="tariff_name" class="form-control" required placeholder="Например: Стандарт">
+                </div>
+                <button type="submit" name="add" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Добавить тариф
+                </button>
+            </form>
+        </div>
+
+        <!-- Tariffs List -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-list"></i> Список тарифов</h3>
+                <div class="search-container">
+                    <input type="text" class="form-control search-input" placeholder="Поиск тарифов...">
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Название</th>
+                            <th>Дата создания</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in tariffs %}
+                        <tr>
+                            <td>{{ t.id }}</td>
+                            <td>{{ t.name }}</td>
+                            <td>{{ t.created_at.strftime('%d.%m.%Y %H:%M') if t.created_at else 'Не указано' }}</td>
+                            <td>
+                                <form method="post" style="display: inline;">
+                                    <input type="hidden" name="delete" value="{{ t.id }}">
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Вы уверены, что хотите удалить этот тариф?')">
+                                        <i class="fas fa-trash"></i> Удалить
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if not tariffs %}
+            <div class="empty-state">
+                <i class="fas fa-tags" style="font-size: 3rem; color: var(--secondary-color);"></i>
+                <h3>Нет тарифов</h3>
+                <p>Добавьте первый тариф, чтобы начать работу</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Tariff Statistics -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-chart-bar"></i> Статистика по тарифам</h3>
+            </div>
+            <div class="chart-container" data-chart="bar" data-chart-data='{"Стандарт": 45, "Премиум": 30, "Люкс": 25}'></div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>

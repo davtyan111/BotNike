@@ -1,18 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <title>Вход в админку</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход в админку</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
-  <h2>🔐 Войти</h2>
-  <form method="post">
-    <label>Логин:</label><br>
-    <input type="text" name="username" required><br><br>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-user-shield"></i>
+                <h2>Админ Панель</h2>
+                <p>Войдите в систему для продолжения</p>
+            </div>
+            
+            <form method="post" class="login-form">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-user"></i> Логин
+                    </label>
+                    <input type="text" name="username" class="form-control" required placeholder="Введите логин">
+                </div>
 
-    <label>Пароль:</label><br>
-    <input type="password" name="password" required><br><br>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-lock"></i> Пароль
+                    </label>
+                    <input type="password" name="password" class="form-control" required placeholder="Введите пароль">
+                </div>
 
-    <button type="submit">Войти</button>
-  </form>
+                <button type="submit" class="btn btn-primary login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Войти
+                </button>
+            </form>
+            
+            <div class="login-footer">
+                <p>Забыли пароль? <a href="#">Свяжитесь с администратором</a></p>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .login-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+            padding: 2rem;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .login-header h2 {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: var(--secondary-color);
+        }
+
+        .login-form .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .login-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </body>
 </html>

@@ -1,27 +1,113 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>📊 Управление типами</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление типами</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  <h2>📊 Управление типами</h2>
+    <!-- Header -->
+    <header class="admin-header">
+        <h1><i class="fas fa-cog"></i> Админ Панель</h1>
+        <div class="user-info">
+            <span>Добро пожаловать, Администратор</span>
+            <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+        </div>
+    </header>
 
-  <form method="post">
-    <input type="text" name="name" placeholder="Новый тип" required>
-    <button type="submit" name="add">➕ Добавить</button>
-  </form>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <ul class="sidebar-nav">
+            <li><a href="/"><i class="fas fa-home"></i> Главная</a></li>
+            <li><a href="/tariffs"><i class="fas fa-tags"></i> Тарифы</a></li>
+            <li><a href="/locations"><i class="fas fa-map-marker-alt"></i> Локации</a></li>
+            <li><a href="/subcodes" class="active"><i class="fas fa-list"></i> Типы</a></li>
+            <li><a href="/dashboard"><i class="fas fa-chart-bar"></i> Статистика</a></li>
+            <li><a href="/settings"><i class="fas fa-cog"></i> Настройки</a></li>
+        </ul>
+    </nav>
 
-  <ul>
-    {% for subcode in subcodes %}
-      <li>
-        {{ subcode.name }}
-        <a href="{{ url_for('delete_subcode_route', id=subcode.id) }}">❌ Удалить</a>
-      </li>
-    {% endfor %}
-  </ul>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h2><i class="fas fa-list"></i> Управление типами</h2>
+            <p>Добавляйте и управляйте типами фотосессий</p>
+        </div>
 
-  <br>
-  <a href="{{ url_for('index') }}">← Назад</a>
+        <!-- Add Type Form -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-plus"></i> Добавить новый тип</h3>
+            </div>
+            <form method="POST" class="subcode-form">
+                <div class="form-group">
+                    <label class="form-label">Название типа:</label>
+                    <input type="text" name="name" class="form-control" required placeholder="Например: Портрет">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Добавить тип
+                </button>
+            </form>
+        </div>
+
+        <!-- Types List -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-list"></i> Список типов</h3>
+                <div class="search-container">
+                    <input type="text" class="form-control search-input" placeholder="Поиск типов...">
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Название</th>
+                            <th>Дата создания</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for subcode in subcodes %}
+                        <tr>
+                            <td>{{ subcode.id }}</td>
+                            <td>{{ subcode.name }}</td>
+                            <td>{{ subcode.created_at.strftime('%d.%m.%Y %H:%M') if subcode.created_at else 'Не указано' }}</td>
+                            <td>
+                                <a href="{{ url_for('delete_subcode_route', id=subcode.id) }}" 
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Вы уверены, что хотите удалить этот тип?')">
+                                    <i class="fas fa-trash"></i> Удалить
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if not subcodes %}
+            <div class="empty-state">
+                <i class="fas fa-list" style="font-size: 3rem; color: var(--secondary-color);"></i>
+                <h3>Нет типов</h3>
+                <p>Добавьте первый тип, чтобы начать работу</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Type Statistics -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-chart-line"></i> Статистика по типам</h3>
+            </div>
+            <div class="chart-container" data-chart="line" data-chart-data='{"Портрет": 45, "Групповое": 30, "Семейное": 25}'></div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 </body>
 </html>

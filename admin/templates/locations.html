@@ -1,27 +1,113 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>📍 Управление локациями</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление локациями</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  <h2>📍 Управление локациями</h2>
+    <!-- Header -->
+    <header class="admin-header">
+        <h1><i class="fas fa-cog"></i> Админ Панель</h1>
+        <div class="user-info">
+            <span>Добро пожаловать, Администратор</span>
+            <a href="/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+        </div>
+    </header>
 
-  <form method="POST">
-    <input type="text" name="name" placeholder="Новая локация" required>
-    <button type="submit">Добавить</button>
-  </form>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <ul class="sidebar-nav">
+            <li><a href="/"><i class="fas fa-home"></i> Главная</a></li>
+            <li><a href="/tariffs"><i class="fas fa-tags"></i> Тарифы</a></li>
+            <li><a href="/locations" class="active"><i class="fas fa-map-marker-alt"></i> Локации</a></li>
+            <li><a href="/subcodes"><i class="fas fa-list"></i> Типы</a></li>
+            <li><a href="/dashboard"><i class="fas fa-chart-bar"></i> Статистика</a></li>
+            <li><a href="/settings"><i class="fas fa-cog"></i> Настройки</a></li>
+        </ul>
+    </nav>
 
-  <ul>
-    {% for location in locations %}
-      <li>
-        {{ location.name }}
-        <a href="{{ url_for('delete_location_route', id=location.id) }}">❌ Удалить</a>
-      </li>
-    {% endfor %}
-  </ul>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h2><i class="fas fa-map-marker-alt"></i> Управление локациями</h2>
+            <p>Добавляйте и управляйте локациями для фотосессий</p>
+        </div>
 
-  <br>
-  <a href="{{ url_for('index') }}">← Назад</a>
+        <!-- Add Location Form -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-plus"></i> Добавить новую локацию</h3>
+            </div>
+            <form method="POST" class="location-form">
+                <div class="form-group">
+                    <label class="form-label">Название локации:</label>
+                    <input type="text" name="name" class="form-control" required placeholder="Например: Центральный офис">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Добавить локацию
+                </button>
+            </form>
+        </div>
+
+        <!-- Locations List -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-list"></i> Список локаций</h3>
+                <div class="search-container">
+                    <input type="text" class="form-control search-input" placeholder="Поиск локаций...">
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Название</th>
+                            <th>Дата создания</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for location in locations %}
+                        <tr>
+                            <td>{{ location.id }}</td>
+                            <td>{{ location.name }}</td>
+                            <td>{{ location.created_at.strftime('%d.%m.%Y %H:%M') if location.created_at else 'Не указано' }}</td>
+                            <td>
+                                <a href="{{ url_for('delete_location_route', id=location.id) }}" 
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Вы уверены, что хотите удалить эту локацию?')">
+                                    <i class="fas fa-trash"></i> Удалить
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if not locations %}
+            <div class="empty-state">
+                <i class="fas fa-map-marker-alt" style="font-size: 3rem; color: var(--secondary-color);"></i>
+                <h3>Нет локаций</h3>
+                <p>Добавьте первую локацию, чтобы начать работу</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Location Statistics -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-chart-pie"></i> Статистика по локациям</h3>
+            </div>
+            <div class="chart-container" data-chart="pie" data-chart-data='{"Центральный офис": 45, "Филиал 1": 30, "Филиал 2": 25}'></div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 </body>
 </html>
