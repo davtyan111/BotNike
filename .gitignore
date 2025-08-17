@@ -62,7 +62,7 @@ db.sqlite3-journal
 # Flask stuff:
 instance/
 .webassets-cache
-
+env
 # Scrapy stuff:
 .scrapy
 
@@ -103,13 +103,14 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
+.env
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+env/
 
 # Spyder project settings
 .spyderproject
