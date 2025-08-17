@@ -103,7 +103,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-#.env
+.env
 .venv
 env/
 venv/
@@ -168,16 +168,16 @@ tmp/
 # Security files
 client_secret.json
 drive.json
-#token.pickle
+token.pickle
 auth_once.py
 
 # Configuration files with sensitive data
-#config.py
+config.py
 .env.local
 .env.production
 
 # Google Drive credentials
-#drive.json
+drive.json
 client_secret.json
 token.pickle
 
