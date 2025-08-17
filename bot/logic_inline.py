@@ -40,7 +40,7 @@ def send_tariff_buttons(chat_id, per_row=3):
         btns.append((label, f"tariff:{t['id']}"))
 
     rows = [_row(*chunk) for chunk in _rows_by(btns, per_row=per_row)]
-    rows.append(_row(("🧾 История заказов", "history")))
+    rows.append(_row(("🧾 История заказов", "history"), ("👤 Мой аккаунт", "my_account")))
 
     requests.post(f"{URL}/sendMessage", json={
         "chat_id": chat_id,
