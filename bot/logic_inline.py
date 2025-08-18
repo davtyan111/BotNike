@@ -26,6 +26,22 @@ def _rows_by(buttons, per_row=3):
 
 
 # === 1) Тарифы ===
+def send_start_inline_buttons(chat_id):
+    """Отправляет стартовое сообщение с тремя inline-кнопками: 'Мой профиль', 'Тариф' и 'История'"""
+    keyboard = {
+        "inline_keyboard": [
+            [{"text": "👤 Мой профиль", "callback_data": "profile"}, {"text": "💰 Тариф", "callback_data": "tariff"}],
+            [{"text": "🧾 История заказов", "callback_data": "history"}]
+        ]
+    }
+    
+    requests.post(f"{URL}/sendMessage", json={
+        "chat_id": chat_id,
+        "text": "👋 Привет! Выбери действие:",
+        "reply_markup": keyboard
+    })
+
+
 def send_tariff_buttons(chat_id, per_row=3):
     tariffs = get_all_tariffs()  # [{"id":1,"name":"0.5","emoji":"📦"}] или без emoji
     if not tariffs:
@@ -40,11 +56,12 @@ def send_tariff_buttons(chat_id, per_row=3):
         btns.append((label, f"tariff:{t['id']}"))
 
     rows = [_row(*chunk) for chunk in _rows_by(btns, per_row=per_row)]
-    rows.append(_row(("🧾 История заказов", "history"), ("👤 Мой аккаунт", "my_account")))
+    # Add back button
+    rows.append([{"text": "← Назад", "callback_data": "back_to_start"}])
 
     requests.post(f"{URL}/sendMessage", json={
         "chat_id": chat_id,
-        "text": "👋 Привет! Выбери тариф:",
+        "text": "Выбери тариф:",
         "reply_markup": _inline_keyboard(rows)
     })
 
@@ -63,6 +80,8 @@ def send_type_buttons(chat_id, per_row=3):
         btns.append((label, f"type:{s['id']}"))
 
     rows = [_row(*chunk) for chunk in _rows_by(btns, per_row=per_row)]
+    # Add back button
+    rows.append([{"text": "← Назад", "callback_data": "back_to_tariff"}])
     requests.post(f"{URL}/sendMessage", json={
         "chat_id": chat_id,
         "text": "Теперь выбери тип:",
@@ -84,6 +103,8 @@ def send_location_buttons(chat_id, per_row=3):
         btns.append((label, f"loc:{l['id']}"))
 
     rows = [_row(*chunk) for chunk in _rows_by(btns, per_row=per_row)]
+    # Add back button
+    rows.append([{"text": "← Назад", "callback_data": "back_to_type"}])
     requests.post(f"{URL}/sendMessage", json={
         "chat_id": chat_id,
         "text": "📍 Выбери локацию:",
@@ -93,16 +114,65 @@ def send_location_buttons(chat_id, per_row=3):
 
 # === обработка шагов ===
 def process_callback(data, chat_id, user_id, user_state):
+    if data == "profile":
+        # orders = get_user_orders(user_id)
+        # if not orders:
+        #     send_message(chat_id, "📋 Ваш профиль:\n\nИстория заказов пуста")
+        # else:
+        #     msg = "📋 Ваш профиль:\n\n🕓 Последние заказы:\n"
+        #     for o in orders:
+        #         msg += (f"📦 {o['tariff']} | 🧩 {o['subcode']} | "
+        #                 f"📍 {o['location']} | 🗓 {o['created_at'].strftime('%d.%m %H:%M')}\n")
+        #     send_message(chat_id, msg)
+        return
+
+    if data == "tariff":
+        send_tariff_buttons(chat_id)
+        return
+
     if data == "history":
         orders = get_user_orders(user_id)
         if not orders:
             send_message(chat_id, "❗ История пуста.")
             return
+        
+        # Создаем сообщение с историей и кнопкой "Вернуться домой"
         msg = "🕓 Последние заказы:\n"
         for o in orders:
             msg += (f"📦 {o['tariff']} | 🧩 {o['subcode']} | "
                     f"📍 {o['location']} | 🗓 {o['created_at'].strftime('%d.%m %H:%M')}\n")
-        send_message(chat_id, msg)
+        
+        keyboard = {
+            "inline_keyboard": [
+                [{"text": "🏠 Вернуться домой", "callback_data": "home"}]
+            ]
+        }
+        
+        requests.post(f"{URL}/sendMessage", json={
+            "chat_id": chat_id,
+            "text": msg,
+            "reply_markup": keyboard
+        })
+        return
+
+    if data == "home":
+        # Возвращаемся к начальному меню
+        send_start_inline_buttons(chat_id)
+        return
+
+    if data == "back_to_start":
+        # Возвращаемся к начальному меню из выбора тарифа
+        send_start_inline_buttons(chat_id)
+        return
+
+    if data == "back_to_tariff":
+        # Возвращаемся к выбору тарифа из выбора типа
+        send_tariff_buttons(chat_id)
+        return
+
+    if data == "back_to_type":
+        # Возвращаемся к выбору типа из выбора локации
+        send_type_buttons(chat_id)
         return
 
     # выбор тарифа -> показываем типы
@@ -149,13 +219,35 @@ def process_callback(data, chat_id, user_id, user_state):
         result = find_photo_by_filters(tariff_name, subcode_name, location_name)
         if result:
             photo_url = f"https://drive.google.com/uc?id={result['drive_file_id']}"
+            
+            # Create keyboard with back and home buttons
+            keyboard = {
+                "inline_keyboard": [
+                    [{"text": "← Назад", "callback_data": "back_to_location"}, {"text": "🏠 Домой", "callback_data": "home"}],
+                    [{"text": "🔄 Новый заказ", "callback_data": "tariff"}]
+                ]
+            }
+            
             requests.post(f"{URL}/sendPhoto", json={
                 "chat_id": chat_id,
                 "photo": photo_url,
-                "caption": f"🏙 {location_name.title()} / тариф {tariff_name}-{subcode_name}"
+                "caption": f"🏙 {location_name.title()} / тариф {tariff_name}-{subcode_name}",
+                "reply_markup": keyboard
             })
         else:
-            send_message(chat_id, "❌ Фото не найдено. Попробуйте другой набор.")
+            # Create keyboard for error case
+            keyboard = {
+                "inline_keyboard": [
+                    [{"text": "← Назад", "callback_data": "back_to_location"}, {"text": "🏠 Домой", "callback_data": "home"}],
+                    [{"text": "🔄 Попробовать снова", "callback_data": "tariff"}]
+                ]
+            }
+            
+            requests.post(f"{URL}/sendMessage", json={
+                "chat_id": chat_id,
+                "text": "❌ Фото не найдено. Попробуйте другой набор.",
+                "reply_markup": keyboard
+            })
 
         save_order(user_id, tariff_name, subcode_name, location_name)
         send_support_link(chat_id)

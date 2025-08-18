@@ -2,7 +2,7 @@
 import requests
 from config import URL
 from database.db import get_user_orders
-from bot.logic_inline import process_callback, send_message, send_tariff_buttons
+from bot.logic_inline import process_callback, send_message, send_tariff_buttons, send_start_inline_buttons
 
 user_state = {}
 
@@ -13,10 +13,9 @@ def handle_update(update):
         chat_id = query["message"]["chat"]["id"]
         data = query["data"]
 
-        requests.post(f"{URL}/editMessageReplyMarkup", json={
+        requests.post(f"{URL}/deleteMessage", json={
             "chat_id": chat_id,
-            "message_id": query["message"]["message_id"],
-            "reply_markup": {"inline_keyboard": []}
+            "message_id": query["message"]["message_id"]
         })
 
         process_callback(data, chat_id, user_id, user_state)
@@ -27,18 +26,10 @@ def handle_update(update):
         user_id = str(msg["from"]["id"])
         text = msg.get("text", "")
 
-        if text == "/start":
+        if text == "/start":            
             user_state.pop(user_id, None)
-            send_tariff_buttons(chat_id)  # динамически из БД
+            # Отправляем приветственное сообщение с двумя inline-кнопками
+            send_start_inline_buttons(chat_id)
             return
 
-        if text == "/history":
-            orders = get_user_orders(user_id)
-            if not orders:
-                send_message(chat_id, "❗ История пуста.")
-                return
-            out = "🕓 Последние заказы:\n"
-            for o in orders:
-                out += (f"📦 {o['tariff']} | 🧩 {o['subcode']} | "
-                        f"📍 {o['location']} | 🗓 {o['created_at'].strftime('%d.%m %H:%M')}\n")
-            send_message(chat_id, out)
+        # Все остальные команды теперь работают через inline-кнопки
